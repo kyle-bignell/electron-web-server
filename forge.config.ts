@@ -30,6 +30,19 @@ const config: ForgeConfig = {
       },
     }),
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'kyle-bignell',
+          name: 'electron-web-server',
+        },
+        prerelease: false,
+        draft: true,
+      },
+    },
+  ],
 };
 
 export default config;
