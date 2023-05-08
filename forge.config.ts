@@ -15,6 +15,7 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
+      iconUrl: 'https://kylebignell.co.uk/favicon.ico',
       setupIcon: 'icon.ico',
     }),
     new MakerZIP({}, ['darwin']),
