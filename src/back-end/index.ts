@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, shell } from 'electron';
 import express from 'express';
 import open from 'open';
 import * as path from 'path';
@@ -85,12 +85,21 @@ const startServer = (rootPath: string, port: number): boolean => {
   }
 };
 
-const stopServer = () => {
-  if (expressServer) {
-    expressServer.close();
-  }
+const stopServer = async () => {
+  return new Promise((resolve) => {
+    if (expressServer) {
+      expressServer.closeAllConnections();
+      expressServer.close((error) => {
+        if (error) {
+          console.log(error);
+        }
 
-  return false
+        resolve(false);
+      });
+    }
+
+    resolve(false);
+  });
 };
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -100,7 +109,7 @@ if (require('electron-squirrel-startup')) {
 
 const createWindow = (): void => {
   const mainWindow = new BrowserWindow({
-    height: 600,
+    height: 650,
     width: 800,
     icon: 'icon.ico',
     webPreferences: {
@@ -115,6 +124,11 @@ const createWindow = (): void => {
   ipcMain.handle('stopServer', () => stopServer());
 
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url);
+    return { action: 'deny' };
+  });
+
   mainWindow.removeMenu();
 };
 

@@ -26,8 +26,11 @@ function App() {
   const [findPortStart, setFindPortStart] = useState(Number(localStorage.getItem(Options.FIND_PORT_START)) || 8000);
   const [findPortEnd, setFindPortEnd] = useState(Number(localStorage.getItem(Options.FIND_PORT_END)) || 9000);
   const [serverRunning, setServerRunning] = useState(false);
+  const [url, setURL] = useState("");
 
-  CheckPortTaken(port);
+  if (!serverRunning) {
+    CheckPortTaken(port);
+  }
 
   async function CheckPortTaken(port: number) {
     const response = await (window as unknown as any).commands.portTaken(port);
@@ -74,8 +77,19 @@ function App() {
       return;
     }
 
+    if (portTaken) {
+      alert("Port in use");
+      return;
+    }
+
     const response = await (window as unknown as any).commands.startServer(rootPath, port);
     setServerRunning(response);
+
+    if (response) {
+      setURL(`http://localhost:${port}`);
+    } else {
+      setURL('');
+    }
   }
 
   async function stopServer() {
@@ -86,6 +100,12 @@ function App() {
 
     const response = await (window as unknown as any).commands.stopServer();
     setServerRunning(response);
+
+    if (response) {
+      setURL(`http://localhost:${port}`);
+    } else {
+      setURL('');
+    }
   }
 
   return (
@@ -101,7 +121,7 @@ function App() {
 
         <Box>
           <h2><SettingsInputHdmiIcon></SettingsInputHdmiIcon> Port</h2>
-          <TextField size="small" label="Port" sx={{ width: 100, mr: 8 }} type="number" onChange={changePort} value={port} error={portTaken} helperText={portTaken ? "Port in use" : ""}></TextField>
+          <TextField size="small" label="Port" sx={{ width: 100, mr: 8 }} type="number" onChange={changePort} value={port} error={portTaken && !serverRunning} helperText={portTaken && !serverRunning ? "Port in use" : ""}></TextField>
           <Button variant="contained" onClick={findFreePort}>Find port</Button>
           <TextField size="small" label="Start" sx={{ width: 100, ml: 1 }} type="number" onChange={changeFindPortStart} value={findPortStart}></TextField>
           <TextField size="small" label="End" sx={{ width: 100, ml: 1 }} type="number" onChange={changeFindPortEnd} value={findPortEnd}></TextField>
@@ -110,7 +130,7 @@ function App() {
 
       <Box mt={10}>
         {serverRunning
-          ? <Alert severity="success">Server is running</Alert>
+          ? <Alert severity="success">Server is running <a target="_blank" href={url}>{url}</a> </Alert>
           : <Alert severity="warning">Server is not running</Alert>
         }
       </Box>
