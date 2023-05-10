@@ -1,7 +1,7 @@
 {
   "name": "simple-web-server",
   "productName": "Simple Web Server",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A simple web server for local development of websites.",
   "main": ".webpack/main",
   "scripts": {
