@@ -74,7 +74,11 @@ const startServer = (rootPath: string, port: number): boolean => {
     const url = `http://localhost:${port}`;
 
     const expressApp = express();
-    expressApp.use(express.static(staticPath));
+    expressApp.use(express.static(staticPath, {
+      setHeaders: function(res) {
+        res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
+        res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+      }}));
     expressServer = expressApp.listen(port);
 
     open(url);
